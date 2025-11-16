@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineScope - Movie Search Engine</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="theme.js"></script>
+  <script defer src="app.js"></script>
+</head>
+
+<body>
+  <header>
+    <h1>CineScope</h1>
+
+    <div class="theme-toggle">
+      <img id="themeIcon" src="assets/moon.svg" alt="">
+    </div>
+
+    <div class="search-box">
+      <input id="searchInput" placeholder="Search movies..." onclick="this.select()"/>
+      <button id="searchBtn">Search</button>
+    </div>
+  </header>
+
+  <!-- FILTER SECTION -->
+  <section id="filters">
+    <select id="languageFilter">
+      <option value="te" selected>Telugu</option>
+      <option value="hi">Hindi</option>
+      <option value="en">English</option>
+      <option value="ta">Tamil</option>
+      <option value="ml">Malayalam</option>
+    </select>
+
+    <select id="genreFilter">
+        <option value="action">Action</option>
+    </select>
+
+    <select id="yearFilter">
+      <option value="2025">2025</option>
+      <option value="2024">2024</option>
+      <option value="2023">2023</option>
+      <option value="2022">2022</option>
+      <option value="2021">2021</option>
+      <option value="2020">2020</option>
+      <option value="2019">2019</option>
+      <option value="2018">2018</option>
+      <option value="2017">2017</option>
+      <option value="2016">2016</option>
+      <option value="1999">1999</option>
+    </select>
+
+    <select id="sortFilter">
+      <option value="year_desc" selected>Year ↓</option>
+      <option value="year_asc">Year ↑</option>
+      <option value="rating_desc">Rating ↓</option>
+      <option value="runtime_desc">Duration ↓</option>
+    </select>
+  <p id="total_pages"></p>
+  </section>
+
+  <section id="movieList"></section>
+
+  <!-- PAGINATION -->
+  <div id="pagination">
+    <button id="prevPage">Prev</button>
+    <span id="pageNumber">1</span>
+    <button id="nextPage">Next</button>
+  </div>
+
+</body>
+</html>
