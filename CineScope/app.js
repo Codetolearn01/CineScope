@@ -140,12 +140,18 @@ const searchBtn = document.getElementById("searchBtn");
 const searchInput = document.getElementById("searchInput");
 const pageNumber = document.getElementById("pageNumber");
 const currentLang = document.getElementById("languageFilter");
-const totalPages = document.getElementById("total_pages");
+const year = document.getElementById("year");
+const totalResults = document.getElementById("total_results");
 
 
 // Search button
 searchBtn.onclick = () => {
   currentQuery = searchInput.value.trim();
+//   if(currentQuery === ""){
+//     movieList.innerHTML = "<h1>Please Enter Some Things to Search!!</h1>";
+//     // movieList.innerHTML = year.value;
+//     return;
+//   }
   currentPage = 1;
 //   SearchByMovieName();
   loadAllResults();
@@ -153,11 +159,12 @@ searchBtn.onclick = () => {
 
 async function SearchByMovieName(){
     movieList.innerHTML = "<h2>Loading...</h2>";
+    totalResults.innerHTML = `<h3>Total Results : ${filtered.length}</h3>`;
     const url = `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${currentQuery}&language=${currentLang.value}`;
             // `.replace(/\s+/g, "");
     const res = await fetch(url);
     const data = await res.json();
-    console.log(data.results);
+    // console.log(data.results);
     
     if (!data.results || !Array.isArray(data.results)) {
         movieList.innerHTML = "<h2>No movies available</h2>";
@@ -187,12 +194,17 @@ async function loadAllResults() {
   let apiPage = 1;
 
   while (true) {
-    const url = `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${currentQuery}&page=${apiPage}`;
+    let url = "";
+    if(currentQuery !== ""){
+     url = `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_KEY}&query=${currentQuery}&page=${apiPage}&with_original_language=${currentLang.value}&sort_by=vote_average.desc`;
+    }else if(year.value !== ""){
+     url = `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_KEY}&primary_release_year=${year.value}&page=${apiPage}&with_original_language=${currentLang.value}&sort_by=vote_average.desc`;
+    }
     // `.replace(/\s+/g, "");
-
+    // https://api.themoviedb.org/3/discover/movie?api_key=KEY&primary_release_year=1980
     const res = await fetch(url);
     const data = await res.json();
-    console.log(data.results);
+    // console.log(data.results);
     
     if (!data.results || data.results.length === 0) {
       break; // No more pages
@@ -202,6 +214,7 @@ async function loadAllResults() {
     // console.log(fullResults);
     // console.log(apiPage);
     // break;
+
     if (apiPage >= data.total_pages) break;  // Stop if last API page reached
     apiPage++;
   }
@@ -211,18 +224,26 @@ async function loadAllResults() {
 
 // 🔥 2. Show 20 results for the current website page
 function showPage(page) {
-  totalPages.innerHTML = `<h3>Total Pages : ${page}</h3>`;
   movieList.innerHTML = "";
 
   // Filtering by language (optional)
   const filtered = fullResults.filter(
-    movie => movie.original_language === currentLang.value
+    movie => {
+        if(currentLang.value !==""){
+        return movie.original_language === currentLang.value;
+        }
+        // else if(year.value !== ""){
+        //     return movie.release_date.slice(0,4) === year;
+        // }
+        return fullResults;
+    }
   );
 
   const start = (page - 1) * MOVIES_PER_PAGE;
   const end = start + MOVIES_PER_PAGE;
 
   const pageItems = filtered.slice(start, end);
+  totalResults.innerHTML = `<h3>Total Results : ${filtered.length}</h3>`;
 
   if (pageItems.length === 0) {
     movieList.innerHTML = "<h2>No more movies found</h2>";
@@ -230,16 +251,18 @@ function showPage(page) {
   }
 
   pageItems.forEach(movie => {
-    movieList.innerHTML += `
-      <div class="movieCard">
-          <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}">
-          <div class="content">
-              <h3>${movie.title}</h3>
-              <p><b>Year:</b> ${movie.release_date?.slice(0, 4) || "N/A"}</p>
-              <button onclick="openMovie(${movie.id})">Click Here To Watch</button>
-          </div>
-      </div>
-    `;
+    if(movie.poster_path && movie.title && movie.release_date){
+        movieList.innerHTML += `
+        <div class="movieCard">
+            <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}">
+            <div class="content">
+                <h3>${movie.title}</h3>
+                <p><b>Year:</b> ${movie.release_date?.slice(0, 4) || "N/A"}</p>
+                <button onclick="openMovie(${movie.id})">Click Here To Watch</button>
+            </div>
+        </div>
+        `;
+    }
   });
 
   pageNumber.textContent = page;
